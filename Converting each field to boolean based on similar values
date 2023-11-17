@@ -1,0 +1,15 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+ 
+def Message processData(Message message)
+ 
+{
+ 
+def body = message.getBody(java.lang.String);
+ 
+def output = body.replaceAll("\"(false)\"", "\$1").replaceAll("\"(true)\"", "\$1");
+ 
+message.setBody(output);
+ 
+return message;
+ 
+}
