@@ -1,0 +1,33 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+
+
+def Message processData(Message message) 
+{
+
+    // Get Message Processing Log
+    def messageLog = messageLogFactory.getMessageLog(message);
+    
+    //Get Headers 
+	def map = message.getHeaders();
+	def PesistMessageID = map.get("PesistMessageID");
+	
+	
+	//Get Properties  
+	map = message.getProperties();
+	def AfterMapFlag = map.get("AfterMap");
+    
+    if(messageLog == null || PesistMessageID == null)
+    {
+        return message;
+    }
+    
+    //Depending upon AfterMap Header property, set custom Header as Before Map MPL ID or After Map MPL ID
+    if (AfterMapFlag.equals("true"))
+        messageLog.addCustomHeaderProperty("After Mapping",PesistMessageID)
+    else
+        messageLog.addCustomHeaderProperty("Before Mapping",PesistMessageID)
+
+
+    // Return updated message
+	return message;
+}
