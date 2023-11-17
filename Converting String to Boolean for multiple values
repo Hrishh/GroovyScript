@@ -1,0 +1,28 @@
+import com.sap.gateway.ip.core.customdev.util.Message
+import java.util.HashMap;
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+def Message processData(Message message) {
+    def payload = message.getBody(String)  
+    def json = new JsonSlurper().parseText(payload)
+     json.itemResponse.itemPlantAlternateKeyResponse.each { plant ->
+        if (plant.activeIndicator) {
+            plant.activeIndicator.activeIndicator = convertToBoolean(plant.activeIndicator.activeIndicator)
+        }
+    }
+    json.itemResponse.successIndicator = json.itemResponse.successIndicator.toBoolean()
+    message.setBody(JsonOutput.toJson(json))
+    return message
+}
+static Object convertToBoolean(Object inputValue){
+ 
+        if(inputValue.equals("true")){
+ 
+          return true;
+ 
+        }else{
+ 
+          return false;
+ 
+        }
+}
