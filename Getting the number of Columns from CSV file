@@ -1,0 +1,40 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+
+def Message processData(Message message) {
+
+
+// Get the message payload (CSV content)
+
+def csvContent = message.getBody(String);
+
+
+// Get the first line (header) from the CSV
+
+def firstLine = csvContent.split('\n')[0];
+
+ 
+
+// Split the first line into an array based on commas (CSV format)
+
+def headerValues = firstLine.split(',');
+
+ 
+
+// Check the length of the array
+
+def headerLength = headerValues.length;
+
+
+// Set the first line as the message payload
+
+message.setProperty("length" , headerLength);
+
+
+
+// Return the modified message
+
+return message;
+
+ 
+
+}
