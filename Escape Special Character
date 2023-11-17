@@ -1,0 +1,13 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import org.apache.commons.lang.StringEscapeUtils;
+
+ 
+
+def Message processData(Message message) 
+{
+
+       String body = message.getBody(java.lang.String);
+       message.setBody(StringEscapeUtils.escapeXml(body));
+       return message;
+}
