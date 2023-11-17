@@ -1,0 +1,22 @@
+import com.sap.gateway.ip.core.customdev.util.Message
+import java.util.Map
+import java.util.Iterator
+import javax.activation.DataHandler
+
+ 
+
+def Message processData(Message message) 
+	{   
+		Map<String, DataHandler> attachments = message.getAttachments()  
+		if (attachments.isEmpty()) 
+			 {      
+					throw new Exception ("No content in Attachment")   
+			 } 
+		else {      Iterator<DataHandler> it = attachments.values().iterator()   
+					DataHandler attachment = it.next()     
+					message.setBody(attachment.getContent()) 			
+					message.setProperty("attachmentName", attachment.getName()); // to read the name of the attachment.
+			}   
+		return message
+
+	}
