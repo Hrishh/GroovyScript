@@ -1,0 +1,37 @@
+/* loop1, loop2 are defined in CM */
+
+
+
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import com.sap.it.api.mapping.MappingContext;
+
+def Message processData(Message message)
+{
+// Define the list of URLs
+
+
+def urls = 
+[
+    message.getProperty("loop1"),
+    message.getProperty("loop2"),
+    message.getProperty("loop3"),
+    message.getProperty("loop4"),
+    message.getProperty("loop5"),
+    message.getProperty("loop6"),
+    message.getProperty("loop7")
+   
+]
+// Get the current iteration count from the message property
+def iterationCount = message.getProperty("CamelLoopIndex")
+
+// Calculate the index of the URL to use based on the iteration count
+def urlIndex = iterationCount % urls.size()
+//Get the URL for the current iteration
+def currentURL = urls[urlIndex]
+
+// Set the URL in the message
+message.setProperty("custom_url", currentURL)
+// Return the modified message
+return message
+}
