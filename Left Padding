@@ -1,0 +1,23 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+def Message processData(Message message) {
+    //Body 
+       def body = message.getBody();
+      
+       map = message.getProperties();
+       String value = map.get("PERNR");
+       
+       String empId="";
+       
+        Integer len=value.length();
+        if(len>5){
+              empId=value.substring(len-5,len);
+               message.setProperty("PERNR",empId);
+        }
+        else{
+        empid=value.padLeft(5,"0");
+        message.setProperty("PERNR",empId);
+        }
+
+       return message;
+}
