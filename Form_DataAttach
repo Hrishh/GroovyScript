@@ -1,0 +1,55 @@
+import com.sap.gateway.ip.core.customdev.util.Message
+import javax.activation.DataHandler
+import javax.mail.internet.ContentType
+import javax.mail.internet.MimeBodyPart
+import javax.mail.internet.MimeMultipart
+import javax.mail.util.ByteArrayDataSource
+ 
+ 
+Message processData(Message message) 
+{
+    def mapProperties = message.getProperties()
+    def fileName = mapProperties.get("FileName")
+    def title = mapProperties.get("Title")
+    def filetype = mapProperties.get("FileType")
+ 
+ 
+    byte[] bytes = message.getBody(byte[])
+ 
+ 
+    // Construct Multipart 1
+    MimeBodyPart bodyPart = new MimeBodyPart()
+    ByteArrayDataSource dataSource = new ByteArrayDataSource(bytes, 'image/png')
+    DataHandler byteDataHandler = new DataHandler(dataSource)
+    bodyPart.setDataHandler(byteDataHandler)
+    fileName = fileName.replaceAll("\t", "");
+  //  bodyPart.setFileName("${fileName}")// Set filename with quotes
+
+    //bodyPart.setDisposition('form-data; name="content"')
+ bodyPart.setHeader("Content-Disposition","form-data; name=\"content\"; filename=\""+fileName+"\"")
+ 
+    // Construct Multipart 2
+    String body2 = "{ \"name\": \"${title}\", \"parentFolderId\": \"b719fb30-f71d-4be8-9161-d0a89bbb95a5\", \"format\": \"${filetype}\" }"
+    MimeBodyPart bodyPart1 = new MimeBodyPart()
+    ByteArrayDataSource dataSource1 = new ByteArrayDataSource(body2, 'application/json') // Set appropriate content type
+    DataHandler byteDataHandler1 = new DataHandler(dataSource1)
+    bodyPart1.setDataHandler(byteDataHandler1)
+    bodyPart1.setDisposition('form-data; name="metadata"')
+ 
+    MimeMultipart multipart = new MimeMultipart()
+    multipart.addBodyPart(bodyPart1)
+    multipart.addBodyPart(bodyPart)
+ 
+    // Set multipart into body
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+    multipart.writeTo(outputStream)
+    message.setBody(outputStream)
+ 
+ 
+   // Set Content type with boundary
+    String boundary = (new ContentType(multipart.contentType)).getParameter('boundary');
+   // message.setHeader('Content-Type', "multipart/form-data; boundary=${boundary}")
+   message.setHeader('Content-Type', "multipart/form-data; boundary=\"${boundary}\"")
+ 
+ 
+ 
