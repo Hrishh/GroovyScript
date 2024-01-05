@@ -1,0 +1,19 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+
+import java.util.HashMap;
+
+def Message processData(Message message) {
+
+      byte [] bytes = message.getBody(byte[].class)
+
+      String inS = new String(bytes,"Cp037");
+
+      String Out = new String(inS.getBytes("UTF-8"))
+
+      String Str = Out.replaceAll("(.{63})", "\$1\n");
+
+      message.setBody(Str);
+
+    return message;
+
+}
