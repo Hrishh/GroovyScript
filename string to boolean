@@ -1,0 +1,27 @@
+//This groovy script replaces string data type to boolean data type 
+
+//Reference : SAP Note : 2521044 
+
+//input : { "data" : "false"}
+
+//output : { "data" : false}
+
+ 
+
+import com.sap.gateway.ip.core.customdev.util.Message;
+
+def Message processData(Message message) 
+
+{
+
+def body = message.getBody(java.lang.String) as String;
+
+String output = body.replaceAll("\"(false)\"", "\$1");
+
+output = output.replaceAll("\"(true)\"", "\$1");
+
+message.setBody(output);
+
+return message;
+
+}
