@@ -1,0 +1,53 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import com.sap.it.api.ITApiFactory;
+import com.sap.it.api.ITApi;
+import com.sap.it.api.mapping.ValueMappingApi;
+import groovy.json.JsonSlurper
+import groovy.util.XmlSlurper
+
+def Message processData(Message message) {
+    def body = message.getBody(String) as String
+    def jsonSlurper = new groovy.json.JsonSlurper()
+    def JSONPayload = jsonSlurper.parseText(body)
+    JSONPayload.payload.remove('categories')
+    JSONPayload.payload.remove('userViewCounts')
+    def modifiedJSON = new groovy.json.JsonBuilder(JSONPayload).toPrettyString()
+    def map = message.getProperties();
+     def sourceAgency       = map.get("sourceAgency");
+    def sourceIdentifier    = map.get("sourceIdentifier");
+    def targetAgency        = map.get("targetAgency");
+    def targetIdentifier    = map.get("targetIdentifier");
+    def valueMapApi = ITApiFactory.getApi(ValueMappingApi.class, null)
+    def attributes = JSONPayload.payload.attributes
+    attributes.each { fieldName, fieldValue ->
+        def sourceValue = fieldName.toString()
+        def value = valueMapApi.getMappedValue(sourceAgency, sourceIdentifier, sourceValue, targetAgency, targetIdentifier)
+         if (value != null) {
+            modifiedJSON = modifiedJSON.replaceAll(fieldName, value)
+        }
+        else
+        {
+        modifiedJSON = modifiedJSON.replaceAll(fieldName, "FieldTobeIgnored")
+   }
+    }
+   message.setBody(modifiedJSON);
+    return message
+}
+
+
+def Message getAttributes(Message message) {
+    def xmlPayload = message.getBody(String) as String
+    xmlPayload= xmlPayload.replaceAll("\\[","");
+    xmlPayload= xmlPayload.replaceAll("]","");
+     xmlPayload= xmlPayload.replaceAll("\"","");
+    def startIndex = xmlPayload.indexOf("<attributes>")
+    def endIndex = xmlPayload.indexOf("</attributes>") + "</attributes>".length()
+    def attributesValue = xmlPayload.substring(startIndex, endIndex)
+    
+    if (attributesValue) {
+        message.setProperty("Attributes", attributesValue)
+    }
+
+    return message
+}
