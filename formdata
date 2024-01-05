@@ -1,0 +1,20 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+def Message processData(Message message)
+{
+    def mapProperties = message.getProperties();
+    def fileName = mapProperties.get("FileName");
+    def title = mapProperties.get("Title");
+    def filetype = mapProperties.get("FileType")
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    
+    String formDataPart1='----cpi\r\nContent-Disposition: form-data; name="metadata"\r\n\n {"name" : "'+title+'", "parentFolderId" : "b719fb30-f71d-4be8-9161-d0a89bbb95a5", "format" : "'+filetype+'"} \r\n----cpi\r\nContent-Disposition: form-data; name="content"; filename="'+fileName+'"\r\n'
+    String formDataPart2= '\r\n'+fileName+'\r\n----cpi--'
+    byte[]  formDataPart1Bytes = formDataPart1.getBytes();
+    byte[]  formDataPart2Bytes = formDataPart2.getBytes();
+    outputStream.write(formDataPart1Bytes);
+     outputStream.write(formDataPart2Bytes);
+    message.setBody(outputStream);
+    message.setHeader("Content-Type","multipart/form-data; boundary=cpi");
+    return message;
+}
