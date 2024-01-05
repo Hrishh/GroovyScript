@@ -1,0 +1,12 @@
+import com.sap.it.api.mapping.*
+import com.sap.it.api.mapping.MappingContext;
+
+def String CamelFileName(String CamelFileName,MappingContext context)
+
+{
+  String PropertyValue= context.getProperty(CamelFileName);
+  PropertyValue= PropertyValue.toString();
+
+  return PropertyValue;
+
+}
