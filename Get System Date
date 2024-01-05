@@ -1,0 +1,12 @@
+import com.sap.it.api.mapping.*
+import com.sap.it.api.mapping.MappingContext;
+
+def String SystemDate(String SystemDate,MappingContext context)
+
+{
+  String PropertyValue= context.getProperty(SystemDate);
+  PropertyValue= PropertyValue.toString();
+
+  return PropertyValue;
+
+}
